@@ -1,0 +1,4 @@
+D:\TinyLanguage Compiler\x64\Debug\jpeg62.dll
+D:\TinyLanguage Compiler\x64\Debug\libpng16d.dll
+D:\TinyLanguage Compiler\x64\Debug\zlibd1.dll
+D:\TinyLanguage Compiler\TinyLang.73c5bc7c\x64\Debug\TinyLang.55158471.Up2Date

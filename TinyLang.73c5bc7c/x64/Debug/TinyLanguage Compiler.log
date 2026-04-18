@@ -1,0 +1,6 @@
+﻿  FileName.cpp
+D:\TinyLanguage Compiler\FileName.cpp(19,18): warning C4244: 'initializing': conversion from 'double' to '__int64', possible loss of data
+D:\TinyLanguage Compiler\FileName.cpp(19,33): warning C4244: 'initializing': conversion from 'double' to '__int64', possible loss of data
+  TinyLanguage Compiler.vcxproj -> D:\TinyLanguage Compiler\x64\Debug\TinyLanguage Compiler.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.

@@ -1,13 +1,13 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 
+#include <iostream>
+#include <map>
 #include <nana/gui.hpp>
-#include <nana/gui/widgets/textbox.hpp>
 #include <nana/gui/widgets/button.hpp>
 #include <nana/gui/widgets/listbox.hpp>
-#include <map>
-#include <string>
+#include <nana/gui/widgets/textbox.hpp>
 #include <sstream>
-#include <iostream>
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -26,8 +26,6 @@ void pre() {
         for (int j = 0; j < 128; j++)
             m[i][j] = 50;
 
-    for (char i = '0'; i <= '9'; i++)
-        m[0][i] = 16;
     for (char i = 'A'; i <= 'Z'; i++)
         m[0][i] = 16;
     for (char i = 'a'; i <= 'z'; i++)
@@ -75,9 +73,10 @@ void pre() {
             m[47][i] = 47;
 
     m[0][' '] = 49, m[49][' '] = 49;
-
+	m[0][char(13)] = 49, m[0][char(10)] = 49;
+    m[0][char(9)] = 49;
     for (int i = 0; i < 51; i++)
-		token_name[i] = "Skip"; // Change to "Error" if you want to show errors instead of skipping
+        token_name[i] = "Lexical Error";
 
     token_name[1] = "ADD_OP";
     token_name[2] = "SUB_OP";
@@ -85,6 +84,7 @@ void pre() {
     token_name[4] = "DIV_OP";
     token_name[5] = "LessThan_OP";
     token_name[6] = "Equal_OP";
+    token_name[7] = "Lexical Error";
     token_name[8] = "Assign_OP";
     token_name[9] = "Semi-Colon";
     token_name[10] = "Comma";
@@ -104,42 +104,44 @@ void pre() {
     token_name[39] = "until_KW";
     token_name[44] = "write_KW";
 
+    token_name[45] = "Lexical Error";
     token_name[46] = "string_literal";
 
+    token_name[47] = "Lexical Error";
     token_name[48] = "Skip";
     token_name[49] = "Skip";
 }
 
-
-
-vector<pair<string,string>> tokenization(string code) {
+vector<pair<string, string>> tokenization(string code) {
     int cur = 0;
     string cur_word = "";
-	vector<pair<string, string>> res;
+    vector<pair<string, string>> res;
     for (auto ch : code) {
+        if (ch == '\n' || ch == '\b')
+            ch = ' ';
+        char org = ch;
+        if (ch > 127)
+            ch = '#';
         if (m[cur][ch] == 50) {
             if (token_name[cur] != "Skip")
-                res.push_back({ cur_word,token_name[cur] }); // here the output
+                res.push_back({ cur_word, token_name[cur] });
             cur = 0;
             cur_word = "";
         }
 
-        cur_word += ch;
+        cur_word += org;
         cur = m[cur][ch];
     }
-	
-    if (token_name[cur] != "Skip")
-        res.push_back({ cur_word,token_name[cur] });
+
+    if (token_name[cur] != "Skip" && !cur_word.empty())
+        res.push_back({ cur_word, token_name[cur] });
     return res;
 }
-
-
 
 // ---------------------------------------------------------
 // MAIN UI LOGIC
 // ---------------------------------------------------------
-int main()
-{
+int main() {
     pre();
     using namespace nana;
 
@@ -150,17 +152,17 @@ int main()
     // 2. Create the Widgets
     // Big Text Field
     textbox txt_input{ fm };
-    txt_input.multi_lines(true);   // Allow multiple lines
-    txt_input.line_wrapped(true);  // Wrap text so it doesn't scroll offscreen
+    txt_input.multi_lines(true);  // Allow multiple lines
+    txt_input.line_wrapped(true); // Wrap text so it doesn't scroll offscreen
     txt_input.tip_string("Type text here...");
 
     // Button
-    button btn_process{ fm, "Process Text" };
+    button btn_process{ fm, "Scan Text" };
 
     // Table (Listbox)
     listbox table{ fm };
     table.append_header("Key", 150);   // Column 1: 150 pixels wide
-    table.append_header("Value", 250); // Column 2: 250 pixels wide
+    table.append_header("Token", 250); // Column 2: 250 pixels wide
 
     // 3. Define the Layout
     // vert: Stack vertically
@@ -174,7 +176,6 @@ int main()
 
     // 4. Wire up the Button Click Event
     btn_process.events().click([&txt_input, &table] {
-
         // Step A: Grab the text from the text box
         std::string rawText = txt_input.caption();
 

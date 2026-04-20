@@ -19,12 +19,8 @@ using namespace std;
 const ll N = 2e5 + 5, mod = 1e9 + 7;
 
 int m[51][128];
-int e_s[51];
 string token_name[51];
 void pre() {
-    for (int i = 1; i < 50; i++)
-        e_s[i] = 1;
-    e_s[7] = e_s[45] = e_s[47] = 0;
 
     for (int i = 0; i < 51; i++)
         for (int j = 0; j < 128; j++)
